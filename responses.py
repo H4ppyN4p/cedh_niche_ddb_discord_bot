@@ -1,2 +1,5 @@
-def get_response(user_input: str) -> str:
-    raise NotImplementedError('not implemented yet')
+def send_message(user_input: str) -> str:
+    lowered = user_input.lower()
+
+    if lowered == '/submit':
+        return 'making new channel'
