@@ -3,10 +3,12 @@ import random
 from dotenv import load_dotenv
 
 from discord.ext import commands
-from discord import Intents, Client, Message
+from discord import Intents, Client, Message, PermissionOverwrite
+from discord.utils import get
 
 intents = Intents.default()
 intents.message_content = True
+intents.members = True
 
 
 load_dotenv()
@@ -33,17 +35,28 @@ async def create_channel(ctx):
     guild = ctx.guild
     channels = guild.channels
     does_not_exist = True
+    category = get(ctx.guild.categories, name='|—————APPLICATION—————|')
     for channel in channels:
         if channel.name == new_channel_name:
+            print('channel already exists')
             does_not_exist = False
-            
+
+    
+
+    overwrites = {
+        guild.default_role : PermissionOverwrite(read_messages=False),
+        get(ctx.guild.roles, name='Reviewer'): PermissionOverwrite(read_messages=True),
+        ctx.message.author: PermissionOverwrite(read_messages=True)
+    }        
 
     if does_not_exist == True:
-        await guild.create_text_channel(new_channel_name)      
+        print(ctx.message.author)
+        await guild.create_text_channel(new_channel_name, category= category, overwrites=overwrites)      
         print('created new channel with name of: ' + str(ctx.message.author))  
 
 @create_channel.error
 async def create_channel_error(ctx, error):
-    print(error)        
+    print(error)       
+
 
 bot.run(TOKEN)
